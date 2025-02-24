@@ -44,8 +44,8 @@ const updateTodo = asyncHandler(async(req,res)=>{
 
     const {todo,completed} = req.body
 
-    if (!todo?.trim()){
-        return new ApiError(400,"todo is missing")
+    if (todo == undefined && completed == undefined) {
+        return new ApiError(400,"Atleast one field is required.")
     }
 
     const newTodo = await Todo.findByIdAndUpdate(todoId,{
@@ -54,7 +54,7 @@ const updateTodo = asyncHandler(async(req,res)=>{
     })
 
     const createdTodo = await Todo.findById(newTodo._id)
-
+    
     if (!createdTodo){
         return new ApiError(500,"Something went wrong while updating the todo")
     }
@@ -98,7 +98,7 @@ const getAllTodos = asyncHandler(async(req,res)=>{
     if(query){
         pipeline.push({
             $search: {
-                index: "default",
+                index: "search_todo",
                 text: {
                     query:query,
                     path: "todo"
